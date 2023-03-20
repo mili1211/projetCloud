@@ -18,6 +18,7 @@ ansible --version
 sudo yum install git -y
 git --version
 git clone https://github.com/mili1211/ansible.git /home/ec2-user/ansible/
+sudo chown -R ec2-user /home/ec2-user/ansible
 echo "${local.bastion_key}" > /home/ec2-user/.ssh/id_rsa
 EOF
 
@@ -59,5 +60,32 @@ resource "aws_instance" "docker-host-mili" {
     "owner"    = var.owner
     "entity"   = var.entity
     "ephemere" = var.ephemere_non
+  }
+}
+
+resource "null_resource" "ansible_inventory" {
+  provisioner "local-exec" {
+    command = "sleep 120"
+  }
+
+  provisioner "file" {
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = tls_private_key.private_key.private_key_openssh
+      host        = aws_instance.ansible-controller-mili.public_ip
+    }
+
+    content     = aws_instance.docker-host-mili.private_ip
+    destination = "/home/ec2-user/ansible/host_vars/client"
+  }
+  
+  depends_on = [aws_instance.ansible-controller-mili]
+
+  lifecycle {
+    replace_triggered_by = [
+      aws_instance.docker-host-mili.private_ip
+    ]
   }
 }

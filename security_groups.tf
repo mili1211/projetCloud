@@ -76,3 +76,33 @@ resource "aws_security_group" "load-balancer-sg-mili" {
     "ephemere" = var.ephemere_non
   }
 }
+
+#Jenkins Security Group
+resource "aws_security_group" "jenkins-sg-mili" {
+  name   = "jenkins-sg-mili"
+  vpc_id = aws_vpc.mili-vpc-project-c.id
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  } 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name       = "jenkins-sg-mili"
+    "owner"    = var.owner
+    "entity"   = var.entity
+    "ephemere" = var.ephemere_non
+  }
+}                   

@@ -80,7 +80,7 @@ resource "null_resource" "ansible_inventory" {
     content     = aws_instance.docker-host-mili.private_ip
     destination = "/home/ec2-user/ansible/host_vars/client"
   }
-  
+
   depends_on = [aws_instance.ansible-controller-mili]
 
   lifecycle {
